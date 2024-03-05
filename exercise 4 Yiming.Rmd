@@ -1,0 +1,57 @@
+---
+title: "exercise 4 yiming_qi"
+author: "Yiming Qi"
+date: "2024-03-05"
+output: html_document
+---
+
+```{r}
+library(kableExtra)
+library(dplyr)
+library(quanteda) 
+library(quanteda.textmodels) 
+library(quanteda.textplots) 
+```
+
+```{r}
+#loading data
+kaneko_dfm <- readRDS(gzcon(url("https://github.com/cjbarrie/CTA-ED/blob/main/data/wordscaling/study1_kaneko.rds?raw=true")))
+```
+
+```{r}
+#prepare the newspaper-level document-feature matrix
+names(docvars(kaneko_dfm))
+table(docvars(kaneko_dfm, "Newspaper"))
+```
+
+```{r}
+#compress the document-feature matrix at the newspaper level
+kaneko_dfm_study1 <- dfm_group(kaneko_dfm, groups = Newspaper)
+```
+
+```{r}
+#remove words not used by two or more newspapers
+kaneko_dfm_study1 <- dfm_trim(kaneko_dfm_study1, min_docfreq = 2, docfreq_type = "count")
+```
+
+```{r}
+#size of the document-feature matrix
+dim(kaneko_dfm_study1)
+```
+
+```{r}
+#estimate the Wordfish model
+set.seed(123L)
+dfm_newskaneko_results <- textmodel_wordfish(kaneko_dfm_study1, 
+                                             sparse = TRUE)
+```
+
+```{r}
+#this is what results
+summary(dfm_newskaneko_results)
+```
+
+```{r}
+#visualize results
+textplot_scale1d(dfm_newskaneko_results)
+```
